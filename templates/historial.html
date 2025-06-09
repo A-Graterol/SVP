@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Escaneos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"></script> 
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-clock"></i> Historial de Escaneos</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>IP</th>
+                    <th>Puerto</th>
+                    <th>Banner</th>
+                    <th>Vulnerabilidad</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for scan in scans %}
+                <tr>
+                    <td>{{ scan[0] }}</td>
+                    <td>{{ scan[1] }}</td>
+                    <td>{{ scan[2] }}</td>
+                    <td>{{ scan[3] }}</td>
+                    <td>{{ scan[5] }}</td>
+                    <td>{{ scan[6] }}</td>
+                    <td>
+                        <button onclick="deleteScan({{ scan[0] }})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function deleteScan(scanId) {
+            if (confirm("¿Estás seguro de eliminar este registro?")) {
+                fetch(`/delete/${scanId}`, {
+                    method: "POST"
+                }).then(() => window.location.reload());
+            }
+        }
+    </script>
+</body>
+</html>

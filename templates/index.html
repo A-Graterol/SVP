@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Escáner de Puertos 🔍</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- Fuente de iconos Font Awesome (CDN segura) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> 
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-shield-alt"></i> Escáner de Puertos</h1>
+
+        <form id="scanForm">
+            <label for="ip">Dirección IP:</label>
+            <input type="text" id="ip" name="ip" placeholder="Ejemplo: 192.168.1.1" required>
+
+            <label for="start_port">Puerto Inicial:</label>
+            <input type="number" id="start_port" name="start_port" min="1" max="65535" value="1" required>
+
+            <label for="end_port">Puerto Final:</label>
+            <input type="number" id="end_port" name="end_port" min="1" max="65535" value="1024" required>
+
+            <button type="submit"><i class="fas fa-network-wired"></i> Iniciar Escaneo</button>
+        </form>
+
+        <div id="loader" class="hidden">
+            <p><i class="fas fa-spinner fa-spin"></i> Escaneando puertos... por favor espera.</p>
+        </div>
+
+        <div id="results"></div>
+
+        <div class="actions">
+            <button onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Exportar como PDF</button>
+            <a href="/historial" style="text-decoration: none;">
+                <button><i class="fas fa-history"></i> Ver Historial</button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Modal para descargar PDF -->
+    <div id="modal-overlay" class="hidden" onclick="hideModal()">
+        <div id="modal" onclick="event.stopPropagation();">
+            <span class="close" onclick="hideModal()">&times;</span>
+            <h2><i class="fas fa-file-pdf"></i> Archivo PDF generado</h2>
+            <p>El archivo se ha guardado como <strong>ultimo_escaneo_exportado.pdf</strong></p>
+            <a id="downloadLink" download href="#" target="_blank">
+                <button><i class="fas fa-download"></i> Descargar PDF</button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Archivo JS externo -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
