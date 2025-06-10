@@ -15,7 +15,7 @@ function exportToPDF() {
         return;
     }
 
-    fetch("/scan", { method: "GET" })
+    fetch("/results", { method: "GET" })
         .then(response => response.json())
         .then(data => {
             return fetch("/export/pdf", {

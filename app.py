@@ -152,46 +152,48 @@ def start_scan(ip, start_port, end_port):
     scan_in_progress = False
 
 def generate_pdf(data):
+    filename = "Escaneo de Puertos.pdf"
+    c = canvas.Canvas(filename)
+
+    # Agregar el logo al PDF
+    logo_path = "logo.png"  # Ruta al archivo de logo
     try:
-        filename = "ultimo_escaneo_exportado.pdf"
-        c = canvas.Canvas(filename)
+        # Posición y tamaño del logo (50x50)
+        c.drawImage(logo_path, 50, 780, width=50, height=50)  # Logo en la esquina superior izquierda
 
-        # Agregar el logo al PDF
-        logo_path = "logo.png"  # Ruta al archivo de logo
-        try:
-            c.drawImage(logo_path, 50, 780, width=100, height=50)  # Posición y tamaño del logo
-        except Exception as e:
-            print(f"Error al cargar el logo: {e}")
-
+        # Nombre del programa al lado del logo
         c.setFont("Helvetica-Bold", 16)
-        c.drawString(50, 800, f"Escaneo de Puertos - {data['ip']}")
-        c.setFont("Helvetica", 12)
-
-        c.drawString(50, 780, f"Fecha: {datetime.now()}")
-        c.drawString(50, 765, f"Puertos abiertos: {data['total_open']}")
-        c.drawString(50, 750, f"Duración: {data['duration']}")
-
-        y = 730
-        for port in data["open_ports"]:
-            banner = data["banners"].get(port, "")
-            desc = data["port_descriptions"].get(port, "Desconocido")
-            vulns = data["vulnerabilities"].get(str(port), [])
-            c.setFont("Helvetica-Bold", 12)
-            c.drawString(50, y, f"Puerto {port} - {desc}")
-            c.setFont("Helvetica", 10)
-            c.drawString(50, y - 15, f"Banner: {banner}")
-            if vulns:
-                c.drawString(50, y - 30, f"Vulnerabilidades: {', '.join(vulns)}")
-            y -= 50
-            if y < 50:
-                c.showPage()
-                y = 750
-
-        c.save()
-        return filename
+        c.drawString(110, 780, "SVP - Escáner de Puertos")
     except Exception as e:
-        print(f"Error al generar PDF: {e}")
-        raise
+        print(f"Error al cargar el logo: {e}")
+
+    # Título principal
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(50, 800, f"Escaneo de Puertos - Última IP escaneada: {data['ip']}")
+    c.setFont("Helvetica", 12)
+
+    # Información del escaneo
+    c.drawString(50, 760, f"Puertos abiertos: {data['total_open']}")
+    c.drawString(50, 740, f"Duración: {data['duration']}")
+
+    y = 700
+    for port in data["open_ports"]:
+        banner = data["banners"].get(port, "")
+        desc = data["port_descriptions"].get(port, "Desconocido")
+        vulns = data["vulnerabilities"].get(str(port), [])
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(50, y, f"Puerto {port} - {desc}")
+        c.setFont("Helvetica", 10)
+        c.drawString(50, y - 15, f"Banner: {banner}")
+        if vulns:
+            c.drawString(50, y - 30, f"Vulnerabilidades: {', '.join(vulns)}")
+        y -= 50
+        if y < 50:
+            c.showPage()
+            y = 750
+
+    c.save()
+    return filename
 
 @app.route('/')
 def index():
@@ -228,15 +230,24 @@ def scan():
 
     return jsonify(results)
 
+@app.route('/results', methods=['GET'])
+def get_results():
+    # Aquí puedes devolver los últimos resultados guardados en memoria
+    return jsonify({
+        "ip": "Última IP escaneada",  # Puedes almacenar esto en una variable global si lo deseas
+        "open_ports": open_ports,
+        "banners": banner_data,
+        "port_descriptions": COMMON_PORTS,
+        "vulnerabilities": {str(p): VULNERABILITIES.get(p, []) for p in open_ports},
+        "total_open": len(open_ports),
+        "duration": "0 segundos"
+    })
+
 @app.route('/export/pdf', methods=['POST'])
 def export_pdf():
-    try:
-        data = request.json
-        filename = generate_pdf(data)
-        return jsonify({"file": filename})
-    except Exception as e:
-        print(f"Error al exportar PDF: {e}")
-        return jsonify({"error": "No se pudo generar el PDF. Inténtalo nuevamente."}), 500
+    data = request.json
+    filename = generate_pdf(data)
+    return jsonify({"file": filename})
 
 @app.route('/download_pdf/<filename>', methods=['GET'])
 def download_pdf(filename):
@@ -254,4 +265,4 @@ def delete(scan_id):
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
