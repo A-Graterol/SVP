@@ -1,5 +1,3 @@
-
-
 ```
 # 🔥 SVP (Sistema Virtual de Puertos)
 
@@ -43,9 +41,4 @@ SVP utiliza las siguientes dependencias:
 Si deseas mejorar SVP, envía un **pull request** o abre un **issue** en el repositorio para colaborar en su desarrollo.
 
 ## 📜 Licencia  
-Este proyecto está bajo la licencia **MIT**, permitiendo su uso y modificación dentro de los términos establecidos.
-
----
-
-Este README está diseñado para que lo copies y lo pegues directamente en `README.md`. Puedes modificar cualquier parte para personalizarlo a tu gusto. ¡Déjame saber si quieres agregar más detalles o mejorar alguna sección! 🔥💻
-```
+Este proyecto está bajo la licencia **MIT**, permitiendo su uso y modificación dentro de los términos establecidos. 
