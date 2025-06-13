@@ -39,6 +39,7 @@ VULNERABILITIES = {
 open_ports = []
 scan_in_progress = False
 banner_data = {}
+last_scan_data = {}  # Guardamos aquí los resultados del último escaneo
 
 def init_db():
     if os.path.exists('database.db'):
@@ -152,29 +153,24 @@ def start_scan(ip, start_port, end_port):
     scan_in_progress = False
 
 def generate_pdf(data):
-    filename = "Escaneo de Puertos.pdf"
+    filename = "ultimo_escaneo_exportado.pdf"
     c = canvas.Canvas(filename)
 
-    # Agregar el logo al PDF
-    logo_path = "logo.png"  # Ruta al archivo de logo
+    # Agregar logo
+    logo_path = "logo.png"  # Asegúrate de tener este archivo en tu carpeta
     try:
-        # Posición y tamaño del logo (50x50)
-        c.drawImage(logo_path, 50, 780, width=50, height=50)  # Logo en la esquina superior izquierda
-
-        # Nombre del programa al lado del logo
-        c.setFont("Helvetica-Bold", 16)
-        c.drawString(110, 780, "SVP - Escáner de Puertos")
+        c.drawImage(logo_path, 50, 780, width=50, height=50)
     except Exception as e:
         print(f"Error al cargar el logo: {e}")
 
-    # Título principal
+    # Título con nombre del programa e IP
     c.setFont("Helvetica-Bold", 16)
-    c.drawString(50, 800, f"Escaneo de Puertos - Última IP escaneada: {data['ip']}")
-    c.setFont("Helvetica", 12)
+    c.drawString(110, 780, "SVP - Escáner de Puertos")
+    c.drawString(110, 800, f"Escaneo de Puertos - Última IP escaneada: {data['ip']}")
 
-    # Información del escaneo
-    c.drawString(50, 760, f"Puertos abiertos: {data['total_open']}")
-    c.drawString(50, 740, f"Duración: {data['duration']}")
+    c.setFont("Helvetica", 12)
+    c.drawString(60, 760, f"Puertos abiertos: {data['total_open']}")
+    c.drawString(60, 740, f"Duración: {data['duration']}")
 
     y = 700
     for port in data["open_ports"]:
@@ -228,20 +224,18 @@ def scan():
 
     save_scan_to_db(ip, open_ports, banner_data, COMMON_PORTS, results["vulnerabilities"])
 
+    # Guardar resultados para usarlos luego en /results
+    global last_scan_data
+    last_scan_data = results
+
     return jsonify(results)
 
 @app.route('/results', methods=['GET'])
 def get_results():
-    # Aquí puedes devolver los últimos resultados guardados en memoria
-    return jsonify({
-        "ip": "Última IP escaneada",  # Puedes almacenar esto en una variable global si lo deseas
-        "open_ports": open_ports,
-        "banners": banner_data,
-        "port_descriptions": COMMON_PORTS,
-        "vulnerabilities": {str(p): VULNERABILITIES.get(p, []) for p in open_ports},
-        "total_open": len(open_ports),
-        "duration": "0 segundos"
-    })
+    global last_scan_data
+    if not last_scan_data:
+        return jsonify({"error": "No hay resultados disponibles. Realiza un escaneo primero."}), 400
+    return jsonify(last_scan_data)
 
 @app.route('/export/pdf', methods=['POST'])
 def export_pdf():

@@ -10,11 +10,12 @@ body {
     color: #ffffff;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     min-height: 100vh;
+    display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-bottom: 40px;
 }
 
 .container {
@@ -26,6 +27,12 @@ body {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
     text-align: center;
     margin-top: 30px;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 h1 {
@@ -71,7 +78,6 @@ form button:hover {
 
 .actions {
     margin-top: 20px;
-    text-align: center;
     display: flex;
     justify-content: center;
     gap: 10px;
@@ -131,6 +137,8 @@ form button:hover {
     background-color: #3a3a50;
     border-radius: 8px;
     font-style: italic;
+    width: 100%;
+    max-width: 500px;
 }
 
 #results {
@@ -151,6 +159,11 @@ form button:hover {
     padding: 10px;
     border-radius: 6px;
     font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+#results li:hover {
+    background-color: #444466;
 }
 
 #results h2 {
@@ -186,7 +199,6 @@ td {
     vertical-align: top;
 }
 
-/* Botones dentro de tabla */
 button {
     background-color: transparent;
     border: none;
@@ -212,6 +224,7 @@ button:hover {
     justify-content: center;
     align-items: center;
     z-index: 9999;
+    visibility: hidden;
 }
 
 #modal {
